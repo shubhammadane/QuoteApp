@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Inspire Daily - Quotes App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root {
+      --primary: #6C63FF;
+      --primary-dark: #564FD8;
+      --secondary: #FF6584;
+      --dark: #2D3748;
+      --light: #F7FAFC;
+      --gray: #E2E8F0;
+      --success: #48BB78;
+    }
+    
+    * { 
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f8f9fa;
+      color: var(--dark);
+      line-height: 1.6;
+    }
+    
+    .app-container {
+      display: flex;
+      min-height: 100vh;
+    }
+    
+    /* Sidebar Styles */
+    .sidebar {
+      width: 280px;
+      background: white;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+      padding: 2rem 1rem;
+      position: fixed;
+      height: 100vh;
+      z-index: 100;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding: 0 1rem;
+    }
+    
+    .logo i {
+      font-size: 2rem;
+      color: var(--primary);
+      margin-right: 10px;
+    }
+    
+    .logo h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .nav-menu {
+      list-style: none;
+    }
+    
+    .nav-item {
+      margin-bottom: 0.5rem;
+    }
+    
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      color: var(--dark);
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    
+    .nav-link:hover, .nav-link.active {
+      background: rgba(108, 99, 255, 0.1);
+      color: var(--primary);
+    }
+    
+    .nav-link i {
+      margin-right: 10px;
+      font-size: 1.1rem;
+    }
+    
+    .language-selector {
+      margin-top: 2rem;
+      padding: 0 1rem;
+    }
+    
+    .language-btn {
+      background: rgba(108, 99, 255, 0.1);
+      border: none;
+      border-radius: 20px;
+      padding: 0.5rem 1rem;
+      margin-right: 0.5rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .language-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+    
+    /* Main Content Styles */
+    .main-content {
+      flex: 1;
+      margin-left: 280px;
+      padding: 2rem;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    
+    .header h2 {
+      font-size: 1.75rem;
+      color: var(--dark);
+    }
+    
+    .user-profile {
+      display: flex;
+      align-items: center;
+    }
+    
+    .user-profile img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+    
+    /* Quote Card Styles */
+    .section {
+      display: none;
+    }
+    
+    .section.active {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .quote-card {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      border-left: 4px solid var(--primary);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .quote-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+    }
+    
+    .quote-text {
+      font-size: 1.25rem;
+      line-height: 1.7;
+      margin-bottom: 1rem;
+      color: var(--dark);
+    }
+    
+    .quote-author {
+      font-weight: 600;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+    }
+    
+    .quote-author:before {
+      content: "—";
+      margin-right: 5px;
+    }
+    
+    .quote-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--gray);
+    }
+    
+    .quote-category {
+      background: rgba(108, 99, 255, 0.1);
+      color: var(--primary);
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    
+    .quote-actions {
+      display: flex;
+    }
+    
+    .quote-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.1rem;
+      margin-left: 0.75rem;
+      color: var(--dark);
+      opacity: 0.7;
+      transition: all 0.3s ease;
+    }
+    
+    .quote-btn:hover {
+      opacity: 1;
+      color: var(--primary);
+    }
+    
+    .quote-btn.favorite {
+      color: var(--secondary);
+    }
+    
+    .quote-btn.favorite.active {
+      color: var(--secondary);
+      opacity: 1;
+    }
+    
+    /* Button Styles */
+    .btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+    }
+    
+    .btn i {
+      margin-right: 8px;
+    }
+    
+    .btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(108, 99, 255, 0.3);
+    }
+    
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+    }
+    
+    .btn-outline:hover {
+      background: rgba(108, 99, 255, 0.1);
+    }
+    
+    /* Category Styles */
+    .category-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+    
+    .category-tag {
+      background: white;
+      border: 1px solid var(--gray);
+      border-radius: 20px;
+      padding: 0.5rem 1.25rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .category-tag:hover, .category-tag.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    
+    .empty-state i {
+      font-size: 3rem;
+      color: var(--gray);
+      margin-bottom: 1rem;
+    }
+    
+    .empty-state h3 {
+      color: var(--dark);
+      margin-bottom: 0.5rem;
+    }
+    
+    .empty-state p {
+      color: #718096;
+      margin-bottom: 1.5rem;
+    }
+    
+    /* Responsive Styles */
+    @media (max-width: 992px) {
+      .sidebar {
+        width: 240px;
+      }
+      .main-content {
+        margin-left: 240px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .app-container {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        padding: 1rem;
+      }
+      .main-content {
+        margin-left: 0;
+      }
+      .nav-menu {
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: 1rem;
+      }
+      .nav-item {
+        margin-bottom: 0;
+        margin-right: 0.5rem;
+      }
+      .nav-link {
+        white-space: nowrap;
+      }
+      .logo {
+        margin-bottom: 1rem;
+      }
+      .language-selector {
+        margin-top: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+      <div class="logo">
+        <i class="fas fa-quote-left"></i>
+        <h1>Inspire Daily</h1>
+      </div>
+      
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="#" class="nav-link active" data-section="home">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link" data-section="english">
+            <i class="fas fa-language"></i>
+            <span>English Quotes</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link" data-section="hindi">
+            <i class="fas fa-language"></i>
+            <span>Hindi Quotes</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link" data-section="marathi">
+            <i class="fas fa-language"></i>
+            <span>Marathi Quotes</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link" data-section="categories">
+            <i class="fas fa-tags"></i>
+            <span>Categories</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link" data-section="favorites">
+            <i class="fas fa-heart"></i>
+            <span>Favorites</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link" data-section="about">
+            <i class="fas fa-info-circle"></i>
+            <span>About</span>
+          </a>
+        </li>
+      </ul>
+      
+      <div class="language-selector">
+        <button class="language-btn active" data-lang="all">All</button>
+        <button class="language-btn" data-lang="en">English</button>
+        <button class="language-btn" data-lang="hi">Hindi</button>
+        <button class="language-btn" data-lang="mr">Marathi</button>
+      </div>
+    </div>
+    
+    <!-- Main Content Area -->
+    <div class="main-content">
+      <div class="header">
+        <h2 id="section-title">Quote of the Day</h2>
+        <div class="user-profile">
+          <img src="https://ui-avatars.com/api/?name=User&background=6C63FF&color=fff" alt="User">
+          <span>Welcome, User</span>
+        </div>
+      </div>
+      
+      <!-- Home Section -->
+      <section id="home" class="section active">
+        <div class="quote-card">
+          <div class="quote-text" id="quote-of-day-text">Loading quote...</div>
+          <div class="quote-author" id="quote-of-day-author"></div>
+          <div class="quote-meta">
+            <span class="quote-category" id="quote-of-day-category"></span>
+            <div class="quote-actions">
+              <button class="quote-btn favorite" id="quote-of-day-fav">
+                <i class="far fa-heart"></i>
+              </button>
+              <button class="quote-btn">
+                <i class="fas fa-share-alt"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <button class="btn" id="new-quote-btn">
+          <i class="fas fa-sync-alt"></i> New Quote
+        </button>
+      </section>
+      
+      <!-- English Quotes Section -->
+      <section id="english" class="section">
+        <h3>Inspirational English Quotes</h3>
+        <div id="english-quotes-container"></div>
+      </section>
+      
+      <!-- Hindi Quotes Section -->
+      <section id="hindi" class="section">
+        <h3>प्रेरणादायक हिंदी उद्धरण</h3>
+        <div id="hindi-quotes-container"></div>
+      </section>
+      
+      <!-- Marathi Quotes Section -->
+      <section id="marathi" class="section">
+        <h3>प्रेरणादायी मराठी उद्गार</h3>
+        <div id="marathi-quotes-container"></div>
+      </section>
+      
+      <!-- Categories Section -->
+      <section id="categories" class="section">
+        <h3>Browse by Category</h3>
+        <div class="category-tags">
+          <span class="category-tag active" data-category="all">All</span>
+          <span class="category-tag" data-category="motivation">Motivation</span>
+          <span class="category-tag" data-category="life">Life</span>
+          <span class="category-tag" data-category="love">Love</span>
+          <span class="category-tag" data-category="success">Success</span>
+          <span class="category-tag" data-category="wisdom">Wisdom</span>
+          <span class="category-tag" data-category="funny">Funny</span>
+        </div>
+        
+        <div id="category-quotes-container"></div>
+      </section>
+      
+      <!-- Favorites Section -->
+      <section id="favorites" class="section">
+        <h3>Your Favorite Quotes</h3>
+        <div id="favorites-container">
+          <div class="empty-state">
+            <i class="far fa-heart"></i>
+            <h3>No favorites yet</h3>
+            <p>Save your favorite quotes by clicking the heart icon</p>
+            <button class="btn btn-outline" id="explore-quotes-btn">
+              <i class="fas fa-search"></i> Explore Quotes
+            </button>
+          </div>
+        </div>
+      </section>
+      
+      <!-- About Section -->
+      <section id="about" class="section">
+        <div class="quote-card">
+          <h3>About Inspire Daily</h3>
+          <p>Inspire Daily is a beautiful quotes app designed to bring motivation and positivity to your everyday life. With quotes in English, Hindi, and Marathi, you can find inspiration in your preferred language.</p>
+          <p>The app features:</p>
+          <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+            <li>Daily inspirational quotes</li>
+            <li>Multi-language support</li>
+            <li>Category browsing</li>
+            <li>Favorite quotes saving</li>
+            <li>Modern, responsive design</li>
+          </ul>
+          <p style="margin-top: 1rem;">Version 2.0.0</p>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    // Quote database
+    const quotes = {
+      english: [
+        { 
+          text: "The only way to do great work is to love what you do.", 
+          author: "Steve Jobs", 
+          category: "motivation",
+          language: "en"
+        },
+        { 
+          text: "Success is not final, failure is not fatal: It is the courage to continue that counts.", 
+          author: "Winston Churchill", 
+          category: "success",
+          language: "en"
+        },
+        { 
+          text: "Your time is limited, don't waste it living someone else's life.", 
+          author: "Steve Jobs", 
+          category: "life",
+          language: "en"
+        },
+        { 
+          text: "The future belongs to those who believe in the beauty of their dreams.", 
+          author: "Eleanor Roosevelt", 
+          category: "motivation",
+          language: "en"
+        },
+        { 
+          text: "In the middle of every difficulty lies opportunity.", 
+          author: "Albert Einstein", 
+          category: "wisdom",
+          language: "en"
+        },
+        { 
+          text: "Do not watch the clock. Do what it does. Keep going.", 
+          author: "Sam Levenson", 
+          category: "motivation",
+          language: "en"
+        }
+      ],
+      hindi: [
+        { 
+          text: "खुद को खोजने का सबसे अच्छा तरीका है कि आप खुद को दूसरों की सेवा में खो दें।", 
+          author: "महात्मा गांधी", 
+          category: "wisdom",
+          language: "hi"
+        },
+        { 
+          text: "जीवन में सफल होने के लिए आपको दो चीजों की जरूरत होती है: अज्ञानता और आत्मविश्वास।", 
+          author: "मार्क ट्वेन", 
+          category: "success",
+          language: "hi"
+        },
+        { 
+          text: "अगर आप सूरज की तरह चमकना चाहते हो तो पहले सूरज की तरह जलो।", 
+          author: "अब्दुल कलाम", 
+          category: "motivation",
+          language: "hi"
+        },
+        { 
+          text: "प्रेम वह फूल है जिसकी जड़ें हृदय में होती हैं और जो कहीं भी खिल सकता है।", 
+          author: "अज्ञात", 
+          category: "love",
+          language: "hi"
+        }
+      ],
+      marathi: [
+        { 
+          text: "जगण्याचा उद्देश फक्त जगणे नसून, काहीतरी चांगले करणे हा आहे.", 
+          author: "अज्ञात", 
+          category: "life",
+          language: "mr"
+        },
+        { 
+          text: "यशाची गुरुकिल्ली म्हणजे स्वतःवर विश्वास ठेवणे.", 
+          author: "अज्ञात", 
+          category: "success",
+          language: "mr"
+        },
+        { 
+          text: "प्रेम म्हणजे दुसऱ्याच्या सुखात स्वतःचे सुख शोधणे.", 
+          author: "अज्ञात", 
+          category: "love",
+          language: "mr"
+        },
+        { 
+          text: "आपल्या स्वप्नांना खरीखुरी आकार देण्यासाठी धैर्य हवे.", 
+          author: "अज्ञात", 
+          category: "motivation",
+          language: "mr"
+        }
+      ]
+    };
+    
+    // DOM Elements
+    const sectionTitle = document.getElementById('section-title');
+    const quoteOfDayText = document.getElementById('quote-of-day-text');
+    const quoteOfDayAuthor = document.getElementById('quote-of-day-author');
+    const quoteOfDayCategory = document.getElementById('quote-of-day-category');
+    const quoteOfDayFav = document.getElementById('quote-of-day-fav');
+    const newQuoteBtn = document.getElementById('new-quote-btn');
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('.section');
+    const languageBtns = document.querySelectorAll('.language-btn');
+    const categoryTags = document.querySelectorAll('.category-tag');
+    const exploreQuotesBtn = document.getElementById('explore-quotes-btn');
+    
+    // Initialize the app
+    document.addEventListener('DOMContentLoaded', function() {
+      // Load quote of the day
+      loadRandomQuote();
+      
+      // Load all english quotes
+      loadQuotesByLanguage('english');
+      
+      // Set up event listeners
+      setupEventListeners();
+    });
+    
+    // Set up all event listeners
+    function setupEventListeners() {
+      // Navigation links
+      navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const sectionId = this.getAttribute('data-section');
+          showSection(sectionId);
+        });
+      });
+      
+      // Language selector buttons
+      languageBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          languageBtns.forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          const lang = this.getAttribute('data-lang');
+          filterByLanguage(lang);
+        });
+      });
+      
+      // Category tags
+      categoryTags.forEach(tag => {
+        tag.addEventListener('click', function() {
+          categoryTags.forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+          const category = this.getAttribute('data-category');
+          filterByCategory(category);
+        });
+      });
+      
+      // New quote button
+      newQuoteBtn.addEventListener('click', loadRandomQuote);
+      
+      // Quote of the day favorite button
+      quoteOfDayFav.addEventListener('click', toggleFavorite);
+      
+      // Explore quotes button
+      if (exploreQuotesBtn) {
+        exploreQuotesBtn.addEventListener('click', function() {
+          showSection('english');
+          document.querySelector('.nav-link[data-section="english"]').click();
+        });
+      }
+    }
+    
+    // Show specific section
+    function showSection(sectionId) {
+      // Update active nav link
+      navLinks.forEach(link => link.classList.remove('active'));
+      document.querySelector(`.nav-link[data-section="${sectionId}"]`).classList.add('active');
+      
+      // Update section title
+      const titles = {
+        home: "Quote of the Day",
+        english: "English Quotes",
+        hindi: "Hindi Quotes",
+        marathi: "Marathi Quotes",
+        categories: "Browse by Category",
+        favorites: "Your Favorites",
+        about: "About the App"
+      };
+      sectionTitle.textContent = titles[sectionId];
+      
+      // Show the selected section
+      sections.forEach(section => section.classList.remove('active'));
+      document.getElementById(sectionId).classList.add('active');
+      
+      // Load content if needed
+      if (sectionId === 'english') loadQuotesByLanguage('english');
+      if (sectionId === 'hindi') loadQuotesByLanguage('hindi');
+      if (sectionId === 'marathi') loadQuotesByLanguage('marathi');
+      if (sectionId === 'favorites') loadFavorites();
+      if (sectionId === 'categories') {
+        filterByCategory('all');
+      }
+    }
+    
+    // Load a random quote for the home section
+    function loadRandomQuote() {
+      // Combine all quotes
+      const allQuotes = [...quotes.english, ...quotes.hindi, ...quotes.marathi];
+      const randomIndex = Math.floor(Math.random() * allQuotes.length);
+      const quote = allQuotes[randomIndex];
+      
+      // Update DOM
+      quoteOfDayText.textContent = `"${quote.text}"`;
+      quoteOfDayAuthor.textContent = quote.author;
+      quoteOfDayCategory.textContent = quote.category.charAt(0).toUpperCase() + quote.category.slice(1);
+      
+      // Update favorite button
+      updateFavoriteButton(quoteOfDayFav, quote);
+    }
+    
+    // Load quotes by language
+    function loadQuotesByLanguage(language) {
+      const containerId = `${language}-quotes-container`;
+      const container = document.getElementById(containerId);
+      
+      let html = '';
+      quotes[language].forEach(quote => {
+        html += createQuoteCard(quote);
+      });
+      
+      container.innerHTML = html;
+      
+      // Attach event listeners to favorite buttons
+      document.querySelectorAll(`#${containerId} .quote-btn.favorite`).forEach(btn => {
+        btn.addEventListener('click', function() {
+          const card = this.closest('.quote-card');
+          const quote = {
+            text: card.querySelector('.quote-text').textContent.replace(/^"|"$/g, ''),
+            author: card.querySelector('.quote-author').textContent.replace(/^—\s/, ''),
+            category: card.querySelector('.quote-category').textContent.toLowerCase(),
+            language: language
+          };
+          toggleFavorite.call(this, quote);
+        });
+      });
+    }
+    
+    // Create a quote card HTML
+    function createQuoteCard(quote) {
+      const isFavorite = checkIfFavorite(quote);
+      
+      return `
+        <div class="quote-card">
+          <div class="quote-text">"${quote.text}"</div>
+          <div class="quote-author">— ${quote.author}</div>
+          <div class="quote-meta">
+            <span class="quote-category">${quote.category.charAt(0).toUpperCase() + quote.category.slice(1)}</span>
+            <div class="quote-actions">
+              <button class="quote-btn favorite ${isFavorite ? 'active' : ''}">
+                <i class="${isFavorite ? 'fas' : 'far'} fa-heart"></i>
+              </button>
+              <button class="quote-btn">
+                <i class="fas fa-share-alt"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    // Filter quotes by language
+    function filterByLanguage(lang) {
+      if (lang === 'all') {
+        loadQuotesByLanguage('english');
+        loadQuotesByLanguage('hindi');
+        loadQuotesByLanguage('marathi');
+        return;
+      }
+      
+      const languages = {
+        en: 'english',
+        hi: 'hindi',
+        mr: 'marathi'
+      };
+      
+      if (languages[lang]) {
+        showSection(languages[lang]);
+      }
+    }
+    
+    // Filter quotes by category
+    function filterByCategory(category) {
+      const container = document.getElementById('category-quotes-container');
+      
+      // Combine all quotes
+      let allQuotes = [...quotes.english, ...quotes.hindi, ...quotes.marathi];
+      
+      // Filter by category if not 'all'
+      if (category !== 'all') {
+        allQuotes = allQuotes.filter(q => q.category === category);
+      }
+      
+      // Display quotes
+      let html = '';
+      allQuotes.forEach(quote => {
+        html += createQuoteCard(quote);
+      });
+      
+      container.innerHTML = html || `
+        <div class="empty-state">
+          <i class="far fa-frown"></i>
+          <h3>No quotes found</h3>
+          <p>Try selecting a different category</p>
+        </div>
+      `;
+      
+      // Attach event listeners to favorite buttons
+      document.querySelectorAll('#category-quotes-container .quote-btn.favorite').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const card = this.closest('.quote-card');
+          const quote = {
+            text: card.querySelector('.quote-text').textContent.replace(/^"|"$/g, ''),
+            author: card.querySelector('.quote-author').textContent.replace(/^—\s/, ''),
+            category: card.querySelector('.quote-category').textContent.toLowerCase(),
+            language: 'english' // Default, could be improved
+          };
+          toggleFavorite.call(this, quote);
+        });
+      });
+    }
+    
+    // Toggle favorite status
+    function toggleFavorite(quote) {
+      if (!quote) {
+        // For quote of the day
+        quote = {
+          text: quoteOfDayText.textContent.replace(/^"|"$/g, ''),
+          author: quoteOfDayAuthor.textContent,
+          category: quoteOfDayCategory.textContent.toLowerCase(),
+          language: 'english' // Default, could be improved
+        };
+      }
+      
+      let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+      const index = favorites.findIndex(fav => 
+        fav.text === quote.text && fav.author === quote.author
+      );
+      
+      if (index === -1) {
+        // Add to favorites
+        favorites.push(quote);
+        this.classList.add('active');
+        if (this.querySelector('i')) {
+          this.querySelector('i').classList.replace('far', 'fas');
+        }
+      } else {
+        // Remove from favorites
+        favorites.splice(index, 1);
+        this.classList.remove('active');
+        if (this.querySelector('i')) {
+          this.querySelector('i').classList.replace('fas', 'far');
+        }
+      }
+      
+      localStorage.setItem('favorites', JSON.stringify(favorites));
+      
+      // If we're on favorites page, reload it
+      if (document.getElementById('favorites').classList.contains('active')) {
+        loadFavorites();
+      }
+    }
+    
+    // Check if quote is favorite
+    function checkIfFavorite(quote) {
+      const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+      return favorites.some(fav => 
+        fav.text === quote.text && fav.author === quote.author
+      );
+    }
+    
+    // Update favorite button state
+    function updateFavoriteButton(button, quote) {
+      const isFavorite = checkIfFavorite(quote);
+      button.classList.toggle('active', isFavorite);
+      const icon = button.querySelector('i');
+      if (icon) {
+        icon.className = isFavorite ? 'fas fa-heart' : 'far fa-heart';
+      }
+    }
+    
+    // Load favorites
+    function loadFavorites() {
+      const container = document.getElementById('favorites-container');
+      const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+      
+      if (favorites.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="far fa-heart"></i>
+            <h3>No favorites yet</h3>
+            <p>Save your favorite quotes by clicking the heart icon</p>
+            <button class="btn btn-outline" id="explore-quotes-btn">
+              <i class="fas fa-search"></i> Explore Quotes
+            </button>
+          </div>
+        `;
+        
+        // Re-attach event listener to button
+        document.getElementById('explore-quotes-btn')?.addEventListener('click', function() {
+          showSection('english');
+          document.querySelector('.nav-link[data-section="english"]').click();
+        });
+      } else {
+        let html = '';
+        favorites.forEach(quote => {
+          html += createQuoteCard(quote);
+        });
+        container.innerHTML = html;
+        
+        // Attach event listeners to favorite buttons
+        document.querySelectorAll('#favorites-container .quote-btn.favorite').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const card = this.closest('.quote-card');
+            const quote = {
+              text: card.querySelector('.quote-text').textContent.replace(/^"|"$/g, ''),
+              author: card.querySelector('.quote-author').textContent.replace(/^—\s/, ''),
+              category: card.querySelector('.quote-category').textContent.toLowerCase(),
+              language: 'english' // Default, could be improved
+            };
+            toggleFavorite.call(this, quote);
+          });
+        });
+      }
+    }
+  </script>
+</body>
+</html>
